@@ -147,3 +147,5 @@ fs.writeFileSync(
 );
 console.log(`Search index: ${searchIndex.length} documents`);
 console.log("Done.");
+
+// end
