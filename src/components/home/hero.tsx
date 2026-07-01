@@ -14,7 +14,8 @@ export function Hero() {
             {siteConfig.name}
           </h1>
           <p className="max-w-2xl text-lg text-muted-foreground leading-relaxed">
-            Premium editing resources for After Effects. Curated downloads, practical guides, and solutions for creators at every level.
+            Editing resources from Adobe and more with guides and solutions for creators at every level. Use the password "star" when extracting the files with winRAR.
+            (yes this is a unofficial satvrn.li backup site, since its shut down).
           </p>
         </div>
 
