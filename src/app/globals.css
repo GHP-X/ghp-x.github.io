@@ -1,0 +1,175 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+:root {
+  --background: #f5f5f8;
+  --foreground: #1a1a1f;
+  --muted: #efefef;
+  --muted-foreground: #6b6b7b;
+  --border: #e8e8f0;
+  --ring: #b799ff;
+  --accent: #b799ff;
+  --accent-foreground: #ffffff;
+  --card: #ffffff;
+}
+
+.dark {
+  --background: #0e0e13;
+  --foreground: #f5f5f5;
+  --muted: #2a2a33;
+  --muted-foreground: #8b8b99;
+  --border: #373748;
+  --ring: #c7a9ff;
+  --accent: #b799ff;
+  --accent-foreground: #1a1a1f;
+  --card: #171720;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-ring: var(--ring);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-card: var(--card);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-glow: 0 0 24px rgba(183, 153, 255, 0.2);
+}
+
+.dark {
+  --shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
+  --shadow-glow: 0 0 24px rgba(183, 153, 255, 0.15);
+}
+
+@layer utilities {
+  .glass {
+    background: var(--card);
+    border: 1px solid var(--border);
+  }
+
+  .shadow-soft {
+    box-shadow: var(--shadow-soft);
+  }
+
+  .shadow-md {
+    box-shadow: var(--shadow-md);
+  }
+
+  .shadow-glow {
+    box-shadow: var(--shadow-glow);
+  }
+
+  .transition-smooth {
+    @apply transition-all duration-200 ease-out;
+  }
+
+  .focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+
+  ::selection {
+    @apply bg-accent/25 text-foreground;
+  }
+
+  /* Prose styling for better contrast in light mode */
+  .prose {
+    @apply text-foreground;
+  }
+
+  .prose h1,
+  .prose h2,
+  .prose h3,
+  .prose h4,
+  .prose h5,
+  .prose h6 {
+    @apply text-foreground;
+  }
+
+  .prose p,
+  .prose li,
+  .prose strong {
+    @apply text-foreground;
+  }
+
+  .prose blockquote {
+    @apply text-foreground border-border/50;
+  }
+
+  .prose code {
+    @apply text-foreground;
+  }
+
+  .prose pre {
+    @apply bg-muted/40 border-border;
+  }
+
+  .dark .prose {
+    @apply text-foreground;
+  }
+
+  .dark .prose h1,
+  .dark .prose h2,
+  .dark .prose h3,
+  .dark .prose h4,
+  .dark .prose h5,
+  .dark .prose h6 {
+    @apply text-foreground;
+  }
+
+  .dark .prose p,
+  .dark .prose li,
+  .dark .prose strong {
+    @apply text-foreground;
+  }
+
+  .dark .prose blockquote {
+    @apply text-foreground border-accent/30;
+  }
+}
+
+@keyframes accordion-down {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+  }
+}
+
+@keyframes accordion-up {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
+  }
+}
+
+.animate-accordion-down {
+  animation: accordion-down 0.25s ease-out;
+}
+
+.animate-accordion-up {
+  animation: accordion-up 0.25s ease-out;
+}
