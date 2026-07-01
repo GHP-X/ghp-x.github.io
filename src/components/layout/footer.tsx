@@ -72,7 +72,7 @@ export function Footer() {
             © {new Date().getFullYear()} {siteConfig.name}. Built for editors.
           </p>
           <p className="text-xs text-muted-foreground">
-            Premium resources. Zero clutter.
+            All Kind of creative resources.
           </p>
         </div>
       </div>
