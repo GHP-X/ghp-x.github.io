@@ -42,6 +42,15 @@ jobs:
           echo "Out directory contents:"
           ls -la ./out || true
           du -sh ./out || true
+          echo ""
+          echo "CSS files:"
+          find ./out -name "*.css" -exec ls -lh {} \;
+          echo ""
+          echo "JS files count:"
+          find ./out -name "*.js" | wc -l
+          echo ""
+          echo "HTML files:"
+          find ./out -name "*.html" -type f | head -10
 
       - name: Dump Pages builds (debug)
         env:
