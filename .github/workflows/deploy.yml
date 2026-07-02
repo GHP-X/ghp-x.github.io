@@ -31,6 +31,8 @@ jobs:
         run: npm ci
 
       - name: Build site
+        env:
+          NEXT_PUBLIC_BASE_PATH: ""
         run: npm run build
 
       - name: Add .nojekyll
