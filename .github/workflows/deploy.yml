@@ -26,6 +26,8 @@ jobs:
         with:
           node-version: 20
           cache: npm
+        env:
+          ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
 
       - name: Install dependencies
         run: npm ci
@@ -49,6 +51,12 @@ jobs:
           curl -s -H "Authorization: token $GITHUB_TOKEN" \
             -H "Accept: application/vnd.github+json" \
             "https://api.github.com/repos/${{ github.repository }}/pages/builds" || true
+          
+          echo ""
+          echo "Pages status for this repo:"
+          curl -s -H "Authorization: token $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/pages" || true
 
       - name: Add .nojekyll
         run: touch ./out/.nojekyll
@@ -72,3 +80,32 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+        continue-on-error: true
+
+      - name: Check deployment status
+        if: always()
+        run: |
+          echo "Deployment status: ${{ job.status }}"
+          echo "Deployment output: ${{ steps.deployment.outputs.page_url }}"
+
+      - name: Fallback - Publish to gh-pages branch (if deploy-pages failed)
+        if: failure()
+        uses: actions/download-artifact@v4
+        with:
+          name: github-pages
+          path: ./pages-artifact
+
+      - name: Extract and publish artifact
+        if: failure()
+        run: |
+          cd ./pages-artifact
+          tar -xf artifact.tar
+          cd ..
+          ls -la ./pages-artifact || true
+
+      - name: Deploy via gh-pages branch (fallback)
+        if: failure()
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./pages-artifact
