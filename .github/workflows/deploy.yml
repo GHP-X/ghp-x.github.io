@@ -35,6 +35,21 @@ jobs:
           NEXT_PUBLIC_BASE_PATH: ""
         run: npm run build
 
+      - name: Show build output
+        run: |
+          echo "Out directory contents:"
+          ls -la ./out || true
+          du -sh ./out || true
+
+      - name: Dump Pages builds (debug)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Pages builds for this repo (most recent first):"
+          curl -s -H "Authorization: token $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/pages/builds" || true
+
       - name: Add .nojekyll
         run: touch ./out/.nojekyll
 
@@ -48,6 +63,7 @@ jobs:
 
   deploy:
     needs: build
+    timeout-minutes: 30
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
