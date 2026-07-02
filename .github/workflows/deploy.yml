@@ -104,13 +104,23 @@ jobs:
           name: github-pages
           path: ./pages-artifact
 
-      - name: Extract and publish artifact
+      - name: Extract and verify artifact
         if: failure()
         run: |
-          cd ./pages-artifact
-          tar -xf artifact.tar
-          cd ..
-          ls -la ./pages-artifact || true
+          echo "Contents of artifact directory:"
+          ls -la ./pages-artifact/
+          echo ""
+          echo "Extracting artifact.tar..."
+          cd ./pages-artifact && tar -xf artifact.tar && cd ..
+          echo ""
+          echo "Extracted contents:"
+          ls -la ./pages-artifact/ | head -20
+          echo ""
+          echo "CSS files in artifact:"
+          find ./pages-artifact -name "*.css" -type f | head -10
+          echo ""
+          echo "Total files:"
+          find ./pages-artifact -type f | wc -l
 
       - name: Deploy via gh-pages branch (fallback)
         if: failure()
@@ -118,3 +128,4 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./pages-artifact
+          cname: ghp.wtf
