@@ -2,7 +2,7 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: ["main"]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -11,121 +11,42 @@ permissions:
   id-token: write
 
 concurrency:
-  group: "pages"
+  group: pages
   cancel-in-progress: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
-        env:
-          ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
 
       - name: Install dependencies
         run: npm ci
 
       - name: Build site
         env:
-          NEXT_PUBLIC_BASE_PATH: ""
+          GITHUB_ACTIONS: true
         run: npm run build
 
-      - name: Show build output
-        run: |
-          echo "Out directory contents:"
-          ls -la ./out || true
-          du -sh ./out || true
-          echo ""
-          echo "CSS files:"
-          find ./out -name "*.css" -exec ls -lh {} \;
-          echo ""
-          echo "JS files count:"
-          find ./out -name "*.js" | wc -l
-          echo ""
-          echo "HTML files:"
-          find ./out -name "*.html" -type f | head -10
-
-      - name: Dump Pages builds (debug)
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          echo "Pages builds for this repo (most recent first):"
-          curl -s -H "Authorization: token $GITHUB_TOKEN" \
-            -H "Accept: application/vnd.github+json" \
-            "https://api.github.com/repos/${{ github.repository }}/pages/builds" || true
-          
-          echo ""
-          echo "Pages status for this repo:"
-          curl -s -H "Authorization: token $GITHUB_TOKEN" \
-            -H "Accept: application/vnd.github+json" \
-            "https://api.github.com/repos/${{ github.repository }}/pages" || true
-
-      - name: Add .nojekyll
-        run: touch ./out/.nojekyll
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload Pages artifact
+      - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./out
+          path: out
 
   deploy:
-    needs: build
-    timeout-minutes: 30
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
+    needs: build
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-        continue-on-error: true
-
-      - name: Check deployment status
-        if: always()
-        run: |
-          echo "Deployment status: ${{ job.status }}"
-          echo "Deployment output: ${{ steps.deployment.outputs.page_url }}"
-
-      - name: Fallback - Publish to gh-pages branch (if deploy-pages failed)
-        if: failure()
-        uses: actions/download-artifact@v4
-        with:
-          name: github-pages
-          path: ./pages-artifact
-
-      - name: Extract and verify artifact
-        if: failure()
-        run: |
-          echo "Contents of artifact directory:"
-          ls -la ./pages-artifact/
-          echo ""
-          echo "Extracting artifact.tar..."
-          cd ./pages-artifact && tar -xf artifact.tar && cd ..
-          echo ""
-          echo "Extracted contents:"
-          ls -la ./pages-artifact/ | head -20
-          echo ""
-          echo "CSS files in artifact:"
-          find ./pages-artifact -name "*.css" -type f | head -10
-          echo ""
-          echo "Total files:"
-          find ./pages-artifact -type f | wc -l
-
-      - name: Deploy via gh-pages branch (fallback)
-        if: failure()
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./pages-artifact
-          cname: ghp.wtf
